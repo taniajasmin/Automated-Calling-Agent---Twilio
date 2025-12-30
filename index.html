@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>VetPay Outbound Call Agent</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            padding: 40px;
+        }
+        .card {
+            background: white;
+            max-width: 500px;
+            margin: auto;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-top: 0;
+        }
+        button {
+            padding: 10px 16px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        input[type="file"] {
+            margin-top: 10px;
+        }
+        .status {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>VetPay – Outbound Call Agent</h2>
+
+    <p><strong>Step 1:</strong> Upload daily contact list (CSV)</p>
+    <input type="file" id="csvFile" accept=".csv" />
+    <br />
+    <button onclick="uploadContacts()">Upload Contacts</button>
+
+    <p><strong>Step 2:</strong> Start calling all contacts</p>
+    <button onclick="startCalls()">Start Calls</button>
+
+    <div class="status" id="status"></div>
+</div>
+
+<script>
+    const API_BASE = "http://127.0.0.1:8000"; // change if deployed
+
+    async function uploadContacts() {
+        const fileInput = document.getElementById("csvFile");
+        const status = document.getElementById("status");
+
+        if (!fileInput.files.length) {
+            status.innerText = "Please select a CSV file.";
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        status.innerText = "Uploading contacts...";
+
+        try {
+            const res = await fetch(`${API_BASE}/upload-contacts`, {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await res.json();
+            status.innerText = `Uploaded ${data.count} contacts successfully.`;
+        } catch (err) {
+            status.innerText = "Upload failed.";
+        }
+    }
+
+    async function startCalls() {
+        const status = document.getElementById("status");
+        status.innerText = "Starting outbound calls...";
+
+        try {
+            const res = await fetch(`${API_BASE}/start-calls`, {
+                method: "POST"
+            });
+
+            const data = await res.json();
+            if (data.error) {
+                status.innerText = data.error;
+            } else {
+                status.innerText = `Calling started. Total contacts: ${data.total}`;
+            }
+
+        } catch (err) {
+            status.innerText = "Failed to start calls.";
+        }
+    }
+</script>
+
+</body>
+</html>
