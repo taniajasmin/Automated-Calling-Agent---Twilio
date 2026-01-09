@@ -25,9 +25,7 @@ CALL_RESULTS_FILE = "call_results.json"
 CALL_DELAY_SECONDS = 20
 
 
-# -----------------------------
 # Utils
-# -----------------------------
 def save_result(phone, name, result):
     results = {}
 
@@ -60,9 +58,7 @@ def get_contact_by_phone(phone):
     return None
 
 
-# -----------------------------
 # Upload CSV
-# -----------------------------
 @app.post("/upload-contacts")
 async def upload_contacts(file: UploadFile):
     content = (await file.read()).decode().splitlines()
@@ -85,9 +81,7 @@ async def upload_contacts(file: UploadFile):
     return {"message": "Contacts uploaded", "count": len(contacts)}
 
 
-# -----------------------------
 # Start calls
-# -----------------------------
 @app.post("/start-calls")
 def start_calls():
     if not os.path.exists(CONTACT_FILE):
@@ -112,9 +106,7 @@ def start_calls():
     return {"status": "calling started", "total": len(contacts)}
 
 
-# -----------------------------
 # Voice greeting
-# -----------------------------
 @app.api_route("/twilio/voice", methods=["GET", "POST"])
 async def twilio_voice(request: Request):
     name = request.query_params.get("name", "there")
@@ -138,6 +130,7 @@ async def twilio_voice(request: Request):
     response.say("Thank you for your time. Goodbye.", voice="alice")
 
     return Response(str(response), media_type="application/xml")
+
 
 
 # Transfer handler
