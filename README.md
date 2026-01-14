@@ -69,31 +69,36 @@ output_results/
 uvicorn main:app --reload --port 8000
 ```
 
-3. Expose locally with ngrok (recommended for testing)
+2. Expose locally with ngrok (recommended for testing)
 ```Bash
 ngrok http 8000
 ```
 Copy the https URL and update BASE_URL in config.py.
 
-4. Open the web interface
+3. Open the web interface
 ```text
 http://127.0.0.1:8000/index.html
 ```
 Or use the ngrok URL.
 
-5. Workflow
+4. Workflow
 Upload a CSV file with columns: Client, Name, Phone
 Click Start Calls
 System dials contacts one by one
 Results are saved in output_results/call_results_YYYYMMDD_HHMMSS.csv
-Example CSV format (contacts.csv)
-csv
+
+
+## Example CSV format (contacts.csv)
+```csv
 Client,Name,Phone
 C001,John Doe,+61412345678
 C002,Emma Smith,+61487654321
 C003,Alex Tan,+8801712345678
-Project Structure
-text
+```
+
+
+## Project Structure
+```text
 vetpay-outbound-dialer/
 ├── main.py             # FastAPI application
 ├── config.py           # (create yourself) credentials
@@ -107,7 +112,11 @@ vetpay-outbound-dialer/
 │   ├── goodbye.mp3
 │   └── thank_you_goodbye.mp3
 └── output_results/     # Final CSVs with "Response" column
-Important Notes
+```
+
+
+## Important Notes
+
 Phone normalization: Handles BD (+880) and AU (+61) formats, strips spaces, etc.
 Rate limiting: Calls are made sequentially with a queue to avoid Twilio rate limits.
 Audio generation: Common message is generated once. Short "Hello [name]" is generated per contact if missing.
@@ -120,7 +129,3 @@ Add call recording
 Better error handling & logging
 Docker support
 Authentication on API endpoints
-License
-MIT License
-
-Feel free to fork and adapt for your own use case!
