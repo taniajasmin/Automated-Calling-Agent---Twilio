@@ -10,7 +10,7 @@ The system dials contacts from an uploaded CSV, plays a personalized greeting + 
 - Personalized "Hello [Name]" greeting generated via ElevenLabs TTS
 - Long common message played as pre-generated MP3
 - Speech & DTMF input detection ("transfer me" or press 1)
-- Transfer to human agent (+8801335117990)
+- Transfer to human agent 
 - Call outcome tracking: `no_answer`, `answered_no_transfer`, `successfully_transferred`
 - Automatic CSV result generation with outcome column
 - Simple HTML frontend for upload & start
@@ -91,9 +91,9 @@ Results are saved in output_results/call_results_YYYYMMDD_HHMMSS.csv
 ## Example CSV format (contacts.csv)
 ```csv
 Client,Name,Phone
-C001,John Doe,+61412345678
-C002,Emma Smith,+61487654321
-C003,Alex Tan,+8801712345678
+C001,John Doe,+614123456__
+C002,Emma Smith,+614876543__
+C003,Alex Tan,+88017123456__
 ```
 
 
@@ -117,15 +117,15 @@ vetpay-outbound-dialer/
 
 ## Important Notes
 
-Phone normalization: Handles BD (+880) and AU (+61) formats, strips spaces, etc.
-Rate limiting: Calls are made sequentially with a queue to avoid Twilio rate limits.
-Audio generation: Common message is generated once. Short "Hello [name]" is generated per contact if missing.
-Twilio status callbacks: Only completed events are processed.
-No duplicate transfers: If a call was already marked as transferred, status callback won't overwrite it.
-Future Improvements
-Add real-time progress dashboard
-Support retry for busy/no-answer calls
-Add call recording
-Better error handling & logging
-Docker support
-Authentication on API endpoints
+- Phone normalization: Handles BD (+880) and AU (+61) formats, strips spaces, etc.
+- Rate limiting: Calls are made sequentially with a queue to avoid Twilio rate limits.
+- Audio generation: Common message is generated once. Short "Hello [name]" is generated per contact if missing.
+- Twilio status callbacks: Only completed events are processed.
+- No duplicate transfers: If a call was already marked as transferred, status callback won't overwrite it.
+- Future Improvements
+- Add real-time progress dashboard
+- Support retry for busy/no-answer calls
+- Add call recording
+- Better error handling & logging
+- Docker support
+- Authentication on API endpoints
