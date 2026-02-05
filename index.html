@@ -4,17 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>VetPay Outbound Call Agent</title>
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         :root {
             --primary: #8b6f74;
             --primary-dark: #6d5559;
@@ -26,8 +19,6 @@
             --text-primary: #fdf8f3;
             --text-secondary: #d4c4b8;
             --border: #4a3f3f;
-            --shadow: rgba(139, 111, 116, 0.15);
-            --accent-warm: #f5e6d3;
         }
 
         body {
@@ -35,433 +26,194 @@
             background: var(--bg-dark);
             font-family: 'DM Sans', sans-serif;
             color: var(--text-primary);
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        /* Animated background grid */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(139, 111, 116, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(139, 111, 116, 0.05) 1px, transparent 1px);
-            background-size: 60px 60px;
-            animation: gridMove 20s linear infinite;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(60px, 60px); }
-        }
-
-        /* Gradient orbs */
-        .orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.3;
-            pointer-events: none;
-            z-index: 0;
-            animation: float 20s ease-in-out infinite;
-        }
-
-        .orb-1 {
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, #8b6f74 0%, transparent 70%);
-            top: -300px;
-            right: -300px;
-            animation-delay: 0s;
-        }
-
-        .orb-2 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, #d4a574 0%, transparent 70%);
-            bottom: -250px;
-            left: -250px;
-            animation-delay: 5s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -30px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
+            padding: 40px 20px;
         }
 
         .container {
-            position: relative;
-            z-index: 1;
-            width: 100%;
             max-width: 1000px;
             margin: 0 auto;
-            padding: 60px 30px;
-            animation: fadeInUp 0.8s ease-out;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .card {
             background: var(--bg-card);
-            backdrop-filter: blur(20px);
             border-radius: 32px;
             padding: 50px;
-            box-shadow: 
-                0 0 0 1px var(--border),
-                0 40px 80px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 0 0 1px var(--border), 0 40px 80px rgba(0, 0, 0, 0.3);
         }
 
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            opacity: 0.5;
-        }
-
-        .header {
-            margin-bottom: 50px;
-            animation: fadeInUp 0.8s ease-out 0.1s both;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 500;
-            background: linear-gradient(135deg, rgba(139, 111, 116, 0.25), rgba(139, 111, 116, 0.1));
-            border: 1px solid rgba(139, 111, 116, 0.4);
-            color: var(--primary);
-            margin-bottom: 20px;
-            letter-spacing: 0.3px;
-        }
-
-        .badge::before {
-            content: '●';
-            font-size: 8px;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        .header h1 {
-            font-family: 'DM Sans', sans-serif;
+        h1 {
             font-size: 48px;
             font-weight: 700;
-            font-style: normal;
-            letter-spacing: -0.5px;
-            line-height: 1.2;
             margin-bottom: 16px;
             background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header p {
-            color: var(--text-secondary);
-            font-size: 16px;
-            line-height: 1.6;
-            max-width: 1000px;
         }
 
         .section {
-            margin-bottom: 28px;
+            margin: 28px 0;
             padding: 32px;
             border-radius: 20px;
             background: var(--bg-section);
             border: 1px solid var(--border);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            animation: fadeInUp 0.8s ease-out calc(0.2s + var(--delay, 0s)) both;
-        }
-
-        .section:hover {
-            border-color: rgba(139, 111, 116, 0.5);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-        }
-
-        .section:nth-child(1) { --delay: 0s; }
-        .section:nth-child(2) { --delay: 0.1s; }
-        .section:nth-child(3) { --delay: 0.2s; }
-
-        .section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(180deg, var(--primary), transparent);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .section:hover::before {
-            opacity: 1;
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .step-number {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 700;
-            flex-shrink: 0;
         }
 
         .section h3 {
             font-size: 18px;
-            font-weight: 600;
-            letter-spacing: -0.2px;
-        }
-
-        .file-upload-wrapper {
-            position: relative;
-            margin-top: 16px;
-        }
-
-        input[type="file"] {
-            position: absolute;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-            z-index: 2;
-        }
-
-        .file-upload-label {
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 20px;
-            background: var(--bg-dark);
-            border: 2px dashed var(--border);
-            border-radius: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-secondary);
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .file-upload-label:hover {
-            border-color: var(--primary);
-            background: rgba(139, 111, 116, 0.1);
-            color: var(--primary);
-        }
-
-        .file-upload-label::before {
-            content: '📄';
-            font-size: 24px;
-        }
-
-        input[type="file"]:focus + .file-upload-label {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
-        }
-
-        button {
-            margin-top: 16px;
-            padding: 16px 28px;
-            width: 100%;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            font-family: 'DM Sans', sans-serif;
-        }
-
-        button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        button:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        button span {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             gap: 10px;
         }
 
-        .upload-btn {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            box-shadow: 0 4px 16px var(--shadow);
-        }
-
-        .upload-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(139, 111, 116, 0.5);
-        }
-
-        .upload-btn:active {
-            transform: translateY(0);
-        }
-
-        .call-btn {
-            background: linear-gradient(135deg, var(--success), var(--success-dark));
-            color: white;
-            box-shadow: 0 4px 16px rgba(212, 165, 116, 0.4);
-        }
-
-        .call-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(212, 165, 116, 0.5);
-        }
-
-        .call-btn:active {
-            transform: translateY(0);
-        }
-
-
-
-        .status-box {
-            margin-top: 40px;
-            padding: 24px 28px;
-            border-radius: 16px;
-            background: var(--bg-section);
-            border: 1px solid var(--border);
-            font-size: 14px;
-            min-height: 60px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            position: relative;
-            overflow: hidden;
-            animation: fadeInUp 0.8s ease-out 0.3s both;
-        }
-
-        .status-box::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 3px;
-            height: 100%;
+        .step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             background: var(--primary);
-            transform: scaleY(0);
-            transition: transform 0.3s ease;
-        }
-
-        .status-box.active::before {
-            transform: scaleY(1);
-        }
-
-        .status-icon {
-            font-size: 20px;
-            animation: statusAppear 0.5s ease-out;
-        }
-
-        #downloadBtn {
-            background: linear-gradient(135deg, #4ade80, #22c55e);
-            box-shadow: 0 4px 16px rgba(74, 222, 128, 0.4);
-        }
-
-        #downloadBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(74, 222, 128, 0.6);
-        }
-
-
-        @keyframes statusAppear {
-            from {
-                opacity: 0;
-                transform: scale(0);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .footer {
-            margin-top: 50px;
-            padding-top: 30px;
-            border-top: 1px solid var(--border);
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 13px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 16px;
-            animation: fadeInUp 0.8s ease-out 0.4s both;
+            font-size: 14px;
+            font-weight: bold;
         }
 
-        .footer-divider {
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: var(--text-secondary);
-            opacity: 0.3;
+        input[type="file"] {
+            display: none;
         }
 
-        /* Loading spinner */
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .file-label {
+            display: block;
+            padding: 40px 24px;
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-label:hover {
+            border-color: var(--primary);
+            background: rgba(139, 111, 116, 0.08);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--text-primary);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), var(--success-dark));
+            color: var(--bg-dark);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(139, 111, 116, 0.4);
+        }
+
+        .status-box {
+            margin: 30px 0;
+            padding: 20px 24px;
+            border-radius: 16px;
+            background: var(--bg-section);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        #resultsSection {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .results-header h3 {
+            font-size: 20px;
+            color: var(--text-primary);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-section);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: rgba(139, 111, 116, 0.15);
+        }
+
+        th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(74, 63, 63, 0.5);
+            color: var(--text-secondary);
+        }
+
+        tbody tr:hover {
+            background: rgba(139, 111, 116, 0.08);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .status-badge.successfully_transferred {
+            background: rgba(76, 175, 80, 0.2);
+            color: #81c784;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .status-badge.answered_no_transfer {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ffb74d;
+            border: 1px solid rgba(255, 152, 0, 0.3);
+        }
+
+        .status-badge.no_answer {
+            background: rgba(244, 67, 54, 0.2);
+            color: #e57373;
+            border: 1px solid rgba(244, 67, 54, 0.3);
         }
 
         .spinner {
@@ -474,82 +226,83 @@
             animation: spin 0.6s linear infinite;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 30px 20px;
-            }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
 
-            .card {
-                padding: 30px 24px;
-                border-radius: 24px;
-            }
-
-            .header h1 {
-                font-size: 36px;
-            }
-
-            .section {
-                padding: 24px 20px;
-            }
+        .load-btn {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+            color: white;
+            font-size: 18px;
+            padding: 20px;
         }
     </style>
 </head>
 <body>
 
-<!-- Animated gradient orbs -->
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-
 <div class="container">
     <div class="card">
 
-        <div class="header">
-            <div class="badge">VetPay Internal Tool</div>
-            <h1>Outbound Call Agent</h1>
-            <p>Upload your daily contact list and automatically initiate AI-powered outbound calls with intelligent conversation handling.</p>
-        </div>
+        <h1>📞 Outbound Call Agent</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 40px;">Upload contacts and manage calls</p>
 
+        <!-- Upload Section -->
         <div class="section">
-            <div class="section-header">
-                <div class="step-number">1</div>
-                <h3>Upload Daily Contact List</h3>
-            </div>
-            <div class="file-upload-wrapper">
-                <input type="file" id="csvFile" accept=".csv" />
-                <div class="file-upload-label">
-                    <span>Drop your CSV file here or click to browse</span>
-                </div>
-            </div>
-            <button class="upload-btn" onclick="uploadContacts()">
-                <span><span class="btn-icon" id="uploadIcon">↑</span> Upload Contacts</span>
+            <h3><span class="step-num">1</span> Upload CSV</h3>
+            <label class="file-label" for="csvFile">
+                <span id="fileText">Drop CSV file or click to browse</span>
+            </label>
+            <input type="file" id="csvFile" accept=".csv" />
+            <button class="btn-primary" onclick="uploadContacts()">
+                <span id="uploadIcon">↑</span> Upload Contacts
             </button>
         </div>
 
+        <!-- Call Section -->
         <div class="section">
-            <div class="section-header">
-                <div class="step-number">2</div>
-                <h3>Start Outbound Calls</h3>
-            </div>
-            <button class="call-btn" onclick="startCalls()">
-                <span><span class="btn-icon" id="callIcon">▶</span> Start Calling All Contacts</span>
+            <h3><span class="step-num">2</span> Call Controls</h3>
+
+            <button id="startBtn" class="btn-success" onclick="startCalls()">
+                <span id="callIcon">▶</span> Start Calling All Contacts
+            </button>
+
+            <button id="stopBtn" class="btn-danger" onclick="stopCalls()" style="margin-top:12px;" disabled>
+                <span>■</span> Stop Calling
             </button>
         </div>
 
+        <!-- Status -->
         <div class="status-box" id="status">
-            <span class="status-icon">⏳</span>
+            <span>⏳</span>
             <span>Waiting for action...</span>
         </div>
 
-        <div id="downloadSection" style="display:none; margin-top:30px; animation: fadeInUp 0.6s ease-out;">
-            <button id="downloadBtn" class="upload-btn" onclick="downloadCSV()">
-                <span>⬇ Download Call Results CSV</span>
-            </button>
-        </div>
+        <!-- MANUAL LOAD BUTTON - BIG & OBVIOUS -->
+        <button class="load-btn" onclick="loadResults()">
+            📊 LOAD CALL RESULTS NOW
+        </button>
 
-
-        <div class="footer">
-            <span>VetPay AI Dialer</span>
+        <!-- Results Table -->
+        <div id="resultsSection">
+            <div class="results-header">
+                <h3>📊 Call Results</h3>
+                <button class="btn-primary" onclick="downloadCSV()" style="width: auto; padding: 10px 20px; margin: 0;">
+                    ⬇ Download CSV
+                </button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Response</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody"></tbody>
+                </table>
+            </div>
         </div>
 
     </div>
@@ -558,30 +311,19 @@
 <script>
     const API_BASE = "http://127.0.0.1:8000";
 
-    // Update file label when file is selected
     document.getElementById('csvFile').addEventListener('change', function(e) {
-        const label = this.nextElementSibling;
+        const fileText = document.getElementById('fileText');
         if (this.files.length > 0) {
-            label.innerHTML = `<span>✓ ${this.files[0].name}</span>`;
-            label.style.color = 'var(--primary)';
-            label.style.borderColor = 'var(--primary)';
+            fileText.textContent = `✓ ${this.files[0].name}`;
         }
     });
 
-    function updateStatus(icon, message, isActive = false) {
-        const status = document.getElementById("status");
-        status.innerHTML = `<span class="status-icon">${icon}</span><span>${message}</span>`;
-        if (isActive) {
-            status.classList.add('active');
-        } else {
-            status.classList.remove('active');
-        }
+    function updateStatus(icon, message) {
+        document.getElementById("status").innerHTML = `<span>${icon}</span><span>${message}</span>`;
     }
 
     async function uploadContacts() {
         const fileInput = document.getElementById("csvFile");
-        const uploadIcon = document.getElementById("uploadIcon");
-
         if (!fileInput.files.length) {
             updateStatus("⚠️", "Please select a CSV file first.");
             return;
@@ -589,77 +331,49 @@
 
         const formData = new FormData();
         formData.append("file", fileInput.files[0]);
-
-        updateStatus('<span class="spinner"></span>', "Uploading contacts...", true);
-        uploadIcon.innerHTML = '<span class="spinner"></span>';
+        updateStatus("⏳", "Uploading...");
 
         try {
-            const res = await fetch(`${API_BASE}/upload-contacts`, {
-                method: "POST",
-                body: formData
-            });
-
+            const res = await fetch(`${API_BASE}/upload-contacts`, { method: "POST", body: formData });
             const data = await res.json();
-            uploadIcon.textContent = "✓";
-            updateStatus("✅", `Uploaded ${data.count} contacts successfully.`, true);
-            
-            // Reset icon after animation
-            setTimeout(() => {
-                uploadIcon.textContent = "↑";
-            }, 2000);
+            updateStatus("✅", `Uploaded ${data.count} contacts`);
+            document.getElementById("resultsSection").style.display = "none";
         } catch (err) {
-            uploadIcon.textContent = "✕";
-            updateStatus("❌", "Upload failed. Please try again.");
-            
-            setTimeout(() => {
-                uploadIcon.textContent = "↑";
-            }, 2000);
+            updateStatus("❌", "Upload failed");
         }
     }
 
-    async function startCalls() {
-        const callIcon = document.getElementById("callIcon");
-        
-        updateStatus('<span class="spinner"></span>', "Starting outbound calls...", true);
-        callIcon.innerHTML = '<span class="spinner"></span>';
+    async function startCalls(){
+        setStatus("Starting calls...");
+        const r = await fetch(`${API}/start-calls`, {method:"POST"});
+        const d = await r.json();
 
-        try {
-            const res = await fetch(`${API_BASE}/start-calls`, {
-                method: "POST"
-            });
-
-            const data = await res.json();
-            
-            if (data.error) {
-                callIcon.textContent = "✕";
-                updateStatus("❌", data.error);
-                
-                setTimeout(() => {
-                    callIcon.textContent = "▶";
-                }, 2000);
-            } else {
-                callIcon.textContent = "✓";
-                updateStatus(`Calling started successfully. Total contacts: ${data.total}`, true);
-                startPollingForCompletion();
-
-                setTimeout(() => {
-                    callIcon.textContent = "▶";
-                }, 2000);
-            }
-
-        } catch (err) {
-            callIcon.textContent = "✕";
-            updateStatus("❌", "Failed to start calls. Please try again.");
-            
-            setTimeout(() => {
-                callIcon.textContent = "▶";
-            }, 2000);
+        if(d.error){
+            setStatus(d.error);
+            return;
         }
+
+        document.getElementById("startBtn").disabled = true;
+        document.getElementById("stopBtn").disabled = false;
+
+        setStatus(`Calling ${d.total} contacts...`);
+        startPolling();
     }
+
+    async function stopCalls(){
+        await fetch(`${API}/stop-calls`, {method:"POST"});
+        setStatus("Calling stopped");
+
+        document.getElementById("startBtn").disabled = false;
+        document.getElementById("stopBtn").disabled = true;
+
+        stopPolling();
+    }
+
 
     let pollingInterval = null;
 
-    function startPollingForCompletion() {
+    function startPolling() {
         if (pollingInterval) return;
 
         pollingInterval = setInterval(async () => {
@@ -667,25 +381,73 @@
                 const res = await fetch(`${API_BASE}/call-progress`);
                 const data = await res.json();
 
-                // When backend says all calls done
-                if (data.completed >= data.total && data.total > 0) {
-                    clearInterval(pollingInterval);
-                    pollingInterval = null;
+                updateStatus("📞", `Progress: ${data.completed}/${data.total}`);
 
-                    updateStatus("All calls completed. You can download the results below.", true);
-                    document.getElementById("downloadSection").style.display = "block";
+                if(d.total>0 && d.completed>=d.total){
+                    stopPolling();
+                    setStatus("All calls completed. Load results.");
+
+                    document.getElementById("startBtn").disabled = false;
+                    document.getElementById("stopBtn").disabled = true;
                 }
 
             } catch (e) {
-                console.log("Polling error");
+                console.error("Polling error:", e);
             }
-        }, 5000); // check every 5 seconds
+        }, 5000);
+    }
+
+    async function loadResults() {
+        updateStatus("⏳", "Loading results...");
+        
+        try {
+            const response = await fetch(`${API_BASE}/result-csv`);
+            const csvText = await response.text();
+            
+            console.log("CSV Response:", csvText);
+            
+            if (!csvText || csvText.includes('"status"')) {
+                updateStatus("⚠️", "CSV not ready yet. Please wait and try again.");
+                return;
+            }
+            
+            const lines = csvText.trim().split('\n');
+            const headers = lines[0].split(',');
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = '';
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',');
+                const row = document.createElement('tr');
+                
+                values.forEach((value, index) => {
+                    const td = document.createElement('td');
+                    
+                    if (headers[index].toLowerCase().trim() === 'response') {
+                        const statusClass = value.trim() || 'unknown';
+                        td.innerHTML = `<span class="status-badge ${statusClass}">${value.replace(/_/g, ' ')}</span>`;
+                    } else {
+                        td.textContent = value;
+                    }
+                    
+                    row.appendChild(td);
+                });
+                
+                tbody.appendChild(row);
+            }
+            
+            document.getElementById('resultsSection').style.display = 'block';
+            updateStatus("✅", "Results loaded successfully!");
+            
+        } catch (error) {
+            console.error('Error:', error);
+            updateStatus("❌", "Error loading results: " + error.message);
+        }
     }
 
     function downloadCSV() {
-        window.open(`${API_BASE}/download-results`, "_blank");
+        window.open(`${API_BASE}/result-csv`, "_blank");
     }
-
 </script>
 
 </body>
