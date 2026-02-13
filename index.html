@@ -344,25 +344,27 @@
     }
 
     async function startCalls(){
-        setStatus("Starting calls...");
-        const r = await fetch(`${API}/start-calls`, {method:"POST"});
+        updateStatus("⏳", "Starting calls...");
+
+        const r = await fetch(`${API_BASE}/start-calls`, {method:"POST"});
         const d = await r.json();
 
         if(d.error){
-            setStatus(d.error);
+            updateStatus("❌", d.error);
             return;
         }
 
         document.getElementById("startBtn").disabled = true;
         document.getElementById("stopBtn").disabled = false;
 
-        setStatus(`Calling ${d.total} contacts...`);
+        updateStatus("📞", `Calling ${d.total} contacts...`);
         startPolling();
     }
 
     async function stopCalls(){
-        await fetch(`${API}/stop-calls`, {method:"POST"});
-        setStatus("Calling stopped");
+        await fetch(`${API_BASE}/stop-calls`, {method:"POST"});
+
+        updateStatus("🛑", "Calling stopped");
 
         document.getElementById("startBtn").disabled = false;
         document.getElementById("stopBtn").disabled = true;
@@ -383,9 +385,9 @@
 
                 updateStatus("📞", `Progress: ${data.completed}/${data.total}`);
 
-                if(d.total>0 && d.completed>=d.total){
+                if(data.total > 0 && data.completed >= data.total){
                     stopPolling();
-                    setStatus("All calls completed. Load results.");
+                    updateStatus("All calls completed. Load results.");
 
                     document.getElementById("startBtn").disabled = false;
                     document.getElementById("stopBtn").disabled = true;
