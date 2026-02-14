@@ -9,9 +9,9 @@ TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
-VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "EXAVITQu4vr4xnSDxMaL")
+VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "snyKKuaGYk1VUEh42zbW")
 
-BASE_URL = os.getenv("BASE_URL")  # ngrok / production URL
+BASE_URL = os.getenv("BASE_URL")  
 
 
 HUMAN_AGENT_NUMBER = os.getenv("HUMAN_AGENT_NUMBER")
