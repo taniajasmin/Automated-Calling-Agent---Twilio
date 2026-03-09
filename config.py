@@ -16,3 +16,8 @@ BASE_URL = os.getenv("BASE_URL")
 
 HUMAN_AGENT_NUMBER = os.getenv("HUMAN_AGENT_NUMBER")
 COMMON_MESSAGE_TEXT = os.getenv("COMMON_MESSAGE_TEXT")
+
+# ... Update code ...
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", "a_very_secret_random_string_change_this")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 480  # 8 hours
