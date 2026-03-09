@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, Request, BackgroundTasks
+from fastapi import FastAPI, UploadFile, Request, BackgroundTasks, Depends, HTTPException, status, Form
 from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from twilio.rest import Client
@@ -12,6 +12,19 @@ from datetime import datetime
 from threading import Lock
 import requests
 import queue
+from fastapi.responses import JSONResponse
+from fastapi.responses import RedirectResponse
+
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+from datetime import datetime, timedelta
+from fastapi.security import OAuth2PasswordBearer
+from fastapi.responses import HTMLResponse
+
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
+import bcrypt
 
 
 from config import HUMAN_AGENT_NUMBER, COMMON_MESSAGE_TEXT
@@ -22,7 +35,10 @@ from config import (
     TWILIO_PHONE_NUMBER,
     BASE_URL,
     ELEVENLABS_API_KEY,
-    VOICE_ID
+    VOICE_ID,
+    SECRET_KEY,
+    ALGORITHM,
+    ACCESS_TOKEN_EXPIRE_MINUTES
 )
 
 app = FastAPI(title="VetPay Outbound Dialer")
@@ -37,9 +53,9 @@ app.add_middleware(
 
 twilio = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
-# HUMAN_AGENT_NUMBER = "+8801331756795"
 
-# ─── Paths ────────────────────────────────────────────────────
+
+# ─── Paths ──────────────
 CONTACTS_CSV     = "contacts.csv"
 RESULTS_JSON     = "call_results.json"
 OUTPUT_CSV_DIR   = "output_results"
@@ -49,7 +65,7 @@ os.makedirs(OUTPUT_CSV_DIR, exist_ok=True)
 os.makedirs(AUDIO_DIR, exist_ok=True)
 app.mount("/audio", StaticFiles(directory=AUDIO_DIR), name="audio")
 
-# ─── ElevenLabs TTS ───────────────────────────────────────────
+# ─── ElevenLabs TTS ────
 def generate_audio(text: str, output_path: str):
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
     headers = {
@@ -77,17 +93,6 @@ def generate_audio(text: str, output_path: str):
 # ─── Pre-generate static / common audio files ─────────────────
 COMMON_MESSAGE_PATH = os.path.join(AUDIO_DIR, "common_message_v3.mp3")
 
-
-# COMMON_TEXT = (
-#     "This is an automated call from VetPay. "
-#     "It looks like we may have the wrong payment details for you. "
-#     "If you’d like to update them and speak to our team now, "
-#     "say “transfer me” or press 1. "
-#     "Alternatively you can update your details on your portal at vetpay.com.au. "
-#     "We hope we've been able to assist with your pets treatment. Thank you"
-#     "would you like to transfer?"
-    
-# )
 
 COMMON_TEXT = COMMON_MESSAGE_TEXT
 
@@ -134,9 +139,11 @@ def start_next_call():
         twilio.calls.create(
             to=phone,
             from_=TWILIO_PHONE_NUMBER,
-            url=f"{BASE_URL}/twilio/voice?client={client_id}",
+            # url=f"{BASE_URL}/twilio/voice?client={client_id}",
+            url=f"{BASE_URL}/twilio/voice?phone={phone}",
             status_callback=f"{BASE_URL}/twilio/status",
-            status_callback_event=["completed"],
+            # status_callback_event=["completed"],
+            status_callback_event=["initiated", "ringing", "answered", "completed"],
         )
     except queue.Empty:
         pass
@@ -252,6 +259,10 @@ def generate_final_output_csv():
     print(f"Output CSV created: {out_path}")
 
 # Endpoints
+# @app.get("/")
+# def serve_home():
+#     return FileResponse("index.html")
+
 @app.post("/upload-contacts")
 async def upload_contacts(file: UploadFile):
     content = (await file.read()).decode('utf-8').splitlines()
@@ -346,13 +357,15 @@ def stop_calls():
 
 @app.api_route("/twilio/voice", methods=["GET", "POST"])
 async def twilio_voice(request: Request):
-    client = request.query_params.get("client")
+    # client = request.query_params.get("client")
 
-    phone = None
-    for p, c in contact_map.items():
-        if c["client"] == client:
-            phone = p
-            break
+    # phone = None
+    # for p, c in contact_map.items():
+    #     if c["client"] == client:
+    #         phone = p
+    #         break
+
+    phone = normalize_phone(request.query_params.get("phone"))
 
     vr = VoiceResponse()
 
@@ -389,7 +402,7 @@ async def twilio_voice(request: Request):
 async def transfer_call(request: Request):
     form = await request.form()
 
-    phone_raw = request.query_params.get("phone")  # ✅ ORIGINAL CUSTOMER
+    phone_raw = request.query_params.get("phone")
     phone = normalize_phone(phone_raw)
 
     digits = form.get("Digits")
@@ -449,8 +462,7 @@ async def call_status(request: Request):
                     already_transferred = True
         except:
             pass
-
-    # ── save result only if not transferred ──
+     # ── save result only if not transferred ──
     if not already_transferred:
         if status == "no-answer":
             save_result(phone, name, "no_answer")
@@ -460,6 +472,7 @@ async def call_status(request: Request):
             save_result(phone, name, status)
         elif status == "completed":
             save_result(phone, name, "answered_no_transfer")
+
 
     # ── ALWAYS count & continue ──
     with call_tracker["lock"]:
@@ -512,3 +525,185 @@ def call_progress():
             "total": call_tracker["total"],
             "completed": call_tracker["completed"]
         }
+
+
+
+
+# --- SQLite Setup ---
+SQLALCHEMY_DATABASE_URL = "sqlite:///./users.db"
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+# User Model
+class UserDB(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+
+# Create the database file
+Base.metadata.create_all(bind=engine)
+
+# Dependency to get DB session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+
+@app.on_event("startup")
+async def startup_event():
+    db = SessionLocal()
+    user = db.query(UserDB).filter(UserDB.username == "admin").first()
+    if not user:
+        # Change this line:
+        hashed = hash_password("admin123") 
+        new_user = UserDB(username="admin", hashed_password=hashed)
+        db.add(new_user)
+        db.commit()
+    db.close()
+
+def hash_password(password: str) -> str:
+    # Generate a salt and hash the password
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed.decode('utf-8')
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    # Check if the provided password matches the stored hash
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+
+# Custom dependency to get user from Cookie
+# This handles API security
+async def get_current_user(request: Request, db: Session = Depends(get_db)):
+    token = request.cookies.get("access_token")
+    
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated"
+        )
+    
+    try:
+        # 1. Verify the signature and expiration using your SECRET_KEY
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        
+        if username is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+            
+    except JWTError:
+        # This triggers if the token is fabricated, expired, or tampered with
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+
+    # 2. Double check the database to ensure the user still exists
+    user = db.query(UserDB).filter(UserDB.username == username).first()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User no longer exists")
+        
+    return username
+
+
+# Route to serve the Login Page
+@app.get("/login", response_class=HTMLResponse)
+async def get_login():
+    return FileResponse("login.html")
+
+# Route to serve the Dashboard (index.html)
+@app.get("/index.html", response_class=HTMLResponse)
+async def get_dashboard(request: Request, db: Session = Depends(get_db)):
+    token = request.cookies.get("access_token")
+    
+    if not token:
+        return RedirectResponse(url="/login")
+
+    try:
+        # Verify the token is real
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+        user = db.query(UserDB).filter(UserDB.username == username).first()
+        
+        if not user:
+            return RedirectResponse(url="/login")
+            
+        # If we reach here, the token is 100% valid and verified
+        return FileResponse("index.html")
+        
+    except JWTError:
+        # Token was fabricated or expired! Clear it and send back to login
+        response = RedirectResponse(url="/login")
+        response.delete_cookie("access_token")
+        return response
+
+# Route to redirect the root (/) to the index page
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    return RedirectResponse(url="/index.html")
+
+# --- AUTH ENDPOINTS ---
+
+@app.post("/token")
+async def login(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+    user = db.query(UserDB).filter(UserDB.username == username).first()
+    
+    # Verify user exists and password hash matches
+    if not user or not verify_password(password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+    
+    access_token = jwt.encode(
+        {"sub": username, "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)},
+        SECRET_KEY, algorithm=ALGORITHM
+    )
+    
+    response = JSONResponse(content={"message": "Logged in"})
+    response.set_cookie(
+        key="access_token", 
+        value=access_token, 
+        httponly=True, 
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        samesite="lax"
+    )
+    return response
+
+
+@app.post("/update-account")
+async def update_account(
+    current_password: str = Form(...), 
+    new_username: str = Form(None),
+    new_password: str = Form(None),
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    user = db.query(UserDB).filter(UserDB.username == current_user).first()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # 1. ALWAYS verify the current password before making any changes
+    if not verify_password(current_password, user.hashed_password):
+        raise HTTPException(status_code=400, detail="Current password incorrect")
+
+    # 2. Handle Username Update
+    if new_username and new_username != user.username:
+        # Check if the new username is already taken by someone else
+        existing_user = db.query(UserDB).filter(UserDB.username == new_username).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username already taken")
+        user.username = new_username
+
+    # 3. Handle Password Update
+    if new_password:
+        user.hashed_password = hash_password(new_password)
+
+    db.commit()
+    return {"message": "Account updated successfully"}
+
+@app.post("/logout")
+async def logout():
+    response = JSONResponse(content={"message": "Logged out"})
+    response.delete_cookie("access_token")
+    return response
