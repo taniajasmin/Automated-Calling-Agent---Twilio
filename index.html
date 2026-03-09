@@ -6,302 +6,132 @@
     <title>VetPay Outbound Call Agent</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        /* (Styles remain the same as your previous version) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         :root {
-            --primary: #8b6f74;
-            --primary-dark: #6d5559;
-            --success: #d4a574;
-            --success-dark: #b8885c;
-            --bg-dark: #2a2424;
-            --bg-card: #352e2e;
-            --bg-section: #3f3737;
-            --text-primary: #fdf8f3;
-            --text-secondary: #d4c4b8;
-            --border: #4a3f3f;
+            --primary: #8b6f74; --primary-dark: #6d5559; --success: #d4a574;
+            --success-dark: #b8885c; --danger: #e57373; --bg-dark: #2a2424;
+            --bg-card: #352e2e; --bg-section: #3f3737; --text-primary: #fdf8f3;
+            --text-secondary: #d4c4b8; --border: #4a3f3f;
         }
-
-        body {
-            min-height: 100vh;
-            background: var(--bg-dark);
-            font-family: 'DM Sans', sans-serif;
-            color: var(--text-primary);
-            padding: 40px 20px;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: var(--bg-card);
-            border-radius: 32px;
-            padding: 50px;
-            box-shadow: 0 0 0 1px var(--border), 0 40px 80px rgba(0, 0, 0, 0.3);
-        }
-
-        h1 {
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .section {
-            margin: 28px 0;
-            padding: 32px;
-            border-radius: 20px;
-            background: var(--bg-section);
-            border: 1px solid var(--border);
-        }
-
-        .section h3 {
-            font-size: 18px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .step-num {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-
-        .file-label {
-            display: block;
-            padding: 40px 24px;
-            border: 2px dashed var(--border);
-            border-radius: 16px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .file-label:hover {
-            border-color: var(--primary);
-            background: rgba(139, 111, 116, 0.08);
-        }
-
-        button {
-            width: 100%;
-            padding: 16px 24px;
-            border: none;
-            border-radius: 12px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 16px;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--text-primary);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, var(--success), var(--success-dark));
-            color: var(--bg-dark);
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 24px rgba(139, 111, 116, 0.4);
-        }
-
-        .status-box {
-            margin: 30px 0;
-            padding: 20px 24px;
-            border-radius: 16px;
-            background: var(--bg-section);
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 14px;
-        }
-
-        #resultsSection {
-            margin-top: 30px;
-            display: none;
-        }
-
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .results-header h3 {
-            font-size: 20px;
-            color: var(--text-primary);
-        }
-
-        .table-container {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: var(--bg-section);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        thead {
-            background: rgba(139, 111, 116, 0.15);
-        }
-
-        th {
-            padding: 16px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--text-primary);
-            border-bottom: 2px solid var(--border);
-        }
-
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid rgba(74, 63, 63, 0.5);
-            color: var(--text-secondary);
-        }
-
-        tbody tr:hover {
-            background: rgba(139, 111, 116, 0.08);
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: capitalize;
-        }
-
-        .status-badge.successfully_transferred {
-            background: rgba(76, 175, 80, 0.2);
-            color: #81c784;
-            border: 1px solid rgba(76, 175, 80, 0.3);
-        }
-
-        .status-badge.answered_no_transfer {
-            background: rgba(255, 152, 0, 0.2);
-            color: #ffb74d;
-            border: 1px solid rgba(255, 152, 0, 0.3);
-        }
-
-        .status-badge.no_answer {
-            background: rgba(244, 67, 54, 0.2);
-            color: #e57373;
-            border: 1px solid rgba(244, 67, 54, 0.3);
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .load-btn {
-            background: linear-gradient(135deg, #4CAF50, #388E3C);
-            color: white;
-            font-size: 18px;
-            padding: 20px;
-        }
+        body { min-height: 100vh; background: var(--bg-dark); font-family: 'DM Sans', sans-serif; color: var(--text-primary); padding: 40px 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header-flex { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
+        .card { background: var(--bg-card); border-radius: 32px; padding: 50px; box-shadow: 0 0 0 1px var(--border), 0 40px 80px rgba(0, 0, 0, 0.3); }
+        h1 { font-size: 48px; font-weight: 700; margin-bottom: 16px; background: linear-gradient(135deg, var(--text-primary), var(--text-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-buttons { display: flex; gap: 10px; }
+        .logout-btn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; width: auto; margin-top: 0; }
+        .logout-btn:hover { background: var(--border); color: white; }
+        .logout-btn.danger-hover:hover { background: var(--danger); border-color: var(--danger); }
+        .section { margin: 28px 0; padding: 32px; border-radius: 20px; background: var(--bg-section); border: 1px solid var(--border); }
+        .section h3 { font-size: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
+        input[type="file"] { display: none; }
+        .file-label { display: block; padding: 40px 24px; border: 2px dashed var(--border); border-radius: 16px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .file-label:hover { border-color: var(--primary); background: rgba(139, 111, 116, 0.08); }
+        button { width: 100%; padding: 16px 24px; border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 16px; transition: all 0.3s; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: var(--text-primary); }
+        .btn-success { background: linear-gradient(135deg, var(--success), var(--success-dark)); color: var(--bg-dark); }
+        .btn-danger { background: #d32f2f; color: white; }
+        button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .status-box { margin: 30px 0; padding: 20px 24px; border-radius: 16px; background: var(--bg-section); border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; font-size: 14px; }
+        #resultsSection { margin-top: 30px; display: none; }
+        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .table-container { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-section); }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { padding: 16px; text-align: left; background: rgba(139, 111, 116, 0.15); color: var(--text-primary); border-bottom: 2px solid var(--border); }
+        td { padding: 14px 16px; border-bottom: 1px solid rgba(74, 63, 63, 0.5); color: var(--text-secondary); }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .status-badge.successfully_transferred { background: rgba(76, 175, 80, 0.2); color: #81c784; }
+        .status-badge.answered_no_transfer { background: rgba(255, 152, 0, 0.2); color: #ffb74d; }
+        .status-badge.no_answer { background: rgba(244, 67, 54, 0.2); color: #e57373; }
+        .load-btn { background: linear-gradient(135deg, #4CAF50, #388E3C); color: white; font-size: 18px; padding: 20px; }
+        .settings-input { padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-dark); color: white; width: 100%; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="card">
-
-        <h1>📞 Outbound Call Agent</h1>
-        <p style="color: var(--text-secondary); margin-bottom: 40px;">Upload contacts and manage calls</p>
-
-        <!-- Upload Section -->
-        <div class="section">
-            <h3><span class="step-num">1</span> Upload CSV</h3>
-            <label class="file-label" for="csvFile">
-                <span id="fileText">Drop CSV file or click to browse</span>
-            </label>
-            <input type="file" id="csvFile" accept=".csv" />
-            <button class="btn-primary" onclick="uploadContacts()">
-                <span id="uploadIcon">↑</span> Upload Contacts
-            </button>
-        </div>
-
-        <!-- Call Section -->
-        <div class="section">
-            <h3><span class="step-num">2</span> Call Controls</h3>
-
-            <button id="startBtn" class="btn-success" onclick="startCalls()">
-                <span id="callIcon">▶</span> Start Calling All Contacts
-            </button>
-
-            <button id="stopBtn" class="btn-danger" onclick="stopCalls()" style="margin-top:12px;" disabled>
-                <span>■</span> Stop Calling
-            </button>
-        </div>
-
-        <!-- Status -->
-        <div class="status-box" id="status">
-            <span>⏳</span>
-            <span>Waiting for action...</span>
-        </div>
-
-        <!-- MANUAL LOAD BUTTON - BIG & OBVIOUS -->
-        <button class="load-btn" onclick="loadResults()">
-            📊 LOAD CALL RESULTS NOW
-        </button>
-
-        <!-- Results Table -->
-        <div id="resultsSection">
-            <div class="results-header">
-                <h3>📊 Call Results</h3>
-                <button class="btn-primary" onclick="downloadCSV()" style="width: auto; padding: 10px 20px; margin: 0;">
-                    ⬇ Download CSV
-                </button>
+        <div class="header-flex">
+            <div>
+                <h1>📞 Outbound Call Agent</h1>
+                <p style="color: var(--text-secondary);">Securely manage VetPay automated calls</p>
             </div>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Client</th>
-                            <th>Name</th>
-                            <th>Phone</th>
-                            <th>Response</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultsBody"></tbody>
-                </table>
+            <div class="header-buttons">
+                <!-- SINGLE BACK BUTTON (Shown only in settings) -->
+                <button class="logout-btn" id="backBtnHeader" onclick="toggleView('dashboard')" style="display: none;">← Back to Dashboard</button>
+                <!-- SETTINGS BUTTON (Shown only in dashboard) -->
+                <button class="logout-btn" id="settingsBtn" onclick="toggleView('settings')">Settings</button>
+                <button class="logout-btn danger-hover" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- DASHBOARD VIEW -->
+        <div id="dashboardView">
+            <div class="section">
+                <h3><span class="step-num">1</span> Upload CSV</h3>
+                <label class="file-label" for="csvFile">
+                    <span id="fileText">Drop CSV file or click to browse</span>
+                </label>
+                <input type="file" id="csvFile" accept=".csv" />
+                <button class="btn-primary" onclick="uploadContacts()">Upload Contacts</button>
+            </div>
+
+            <div class="section">
+                <h3><span class="step-num">2</span> Call Controls</h3>
+                <button id="startBtn" class="btn-success" onclick="startCalls()">▶ Start Calling All Contacts</button>
+                <button id="stopBtn" class="btn-danger" onclick="stopCalls()" disabled>■ Stop Calling</button>
+            </div>
+
+            <div class="status-box" id="status">
+                <span>⏳</span><span>Checking authentication...</span>
+            </div>
+
+            <button class="load-btn" onclick="loadResults()">📊 LOAD CALL RESULTS NOW</button>
+
+            <div id="resultsSection">
+                <div class="results-header">
+                    <h3>📊 Call Results</h3>
+                    <button class="btn-primary" onclick="downloadCSV()" style="width: auto; padding: 10px 20px; margin: 0;">⬇ Download CSV</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Client</th><th>Name</th><th>Phone</th><th>Response</th></tr>
+                        </thead>
+                        <tbody id="resultsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS VIEW -->
+        <div id="settingsView" style="display: none;">
+            <div class="section">
+                <h3><span class="step-num">⚙️</span> Account Settings</h3>
+                
+                <p style="color: var(--text-secondary); margin-bottom: 25px; font-size: 14px;">Update your administrator credentials below. You will be logged out after saving.</p>
+                
+                <div style="max-width: 400px; display: flex; flex-direction: column; gap: 15px;">
+                    <div>
+                        <label style="display:block; margin-bottom:5px; font-size:12px; color:var(--text-secondary)">New Username</label>
+                        <input type="text" id="newUsername" class="settings-input" placeholder="Enter new username">
+                    </div>
+
+                    <div>
+                        <label style="display:block; margin-bottom:5px; font-size:12px; color:var(--text-secondary)">New Password</label>
+                        <input type="password" id="newPass" class="settings-input" placeholder="Enter new password">
+                    </div>
+
+                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+                        <label style="display:block; margin-bottom:5px; font-size:12px; color:var(--danger)">Current Password (Required to save changes)</label>
+                        <input type="password" id="oldPass" class="settings-input" placeholder="Verify current password">
+                    </div>
+                    
+                    <button class="btn-primary" onclick="updateAccount()" style="margin-top: 10px;">Save Changes</button>
+                </div>
             </div>
         </div>
 
@@ -309,148 +139,129 @@
 </div>
 
 <script>
-    const API_BASE = "http://127.0.0.1:8000";
+    const API_BASE = ""; 
+
+    // View Toggler
+    function toggleView(view) {
+        const dashboard = document.getElementById('dashboardView');
+        const settings = document.getElementById('settingsView');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const backBtn = document.getElementById('backBtnHeader');
+
+        if (view === 'settings') {
+            dashboard.style.display = 'none';
+            settings.style.display = 'block';
+            settingsBtn.style.display = 'none';
+            backBtn.style.display = 'inline-block';
+        } else {
+            dashboard.style.display = 'block';
+            settings.style.display = 'none';
+            settingsBtn.style.display = 'inline-block';
+            backBtn.style.display = 'none';
+        }
+    }
+
+    async function authorizedFetch(url, options = {}) {
+        try {
+            const res = await fetch(url, options);
+            if (res.status === 401) { window.location.href = "/login"; return null; }
+            return res;
+        } catch (err) { console.error("Fetch error:", err); return null; }
+    }
+
+    async function updateAccount() {
+        const current_password = document.getElementById('oldPass').value;
+        const new_username = document.getElementById('newUsername').value;
+        const new_password = document.getElementById('newPass').value;
+        if (!current_password) { alert("Please enter current password."); return; }
+        const formData = new FormData();
+        formData.append("current_password", current_password);
+        if (new_username) formData.append("new_username", new_username);
+        if (new_password) formData.append("new_password", new_password);
+        const res = await authorizedFetch(`${API_BASE}/update-account`, { method: "POST", body: formData });
+        if (res && res.ok) { alert("Account updated! Please log in again."); logout(); }
+        else if (res) { const err = await res.json(); alert("Error: " + (err.detail || "Failed")); }
+    }
+
+    async function logout() { await fetch(`${API_BASE}/logout`, { method: "POST" }); window.location.href = "/login"; }
 
     document.getElementById('csvFile').addEventListener('change', function(e) {
         const fileText = document.getElementById('fileText');
-        if (this.files.length > 0) {
-            fileText.textContent = `✓ ${this.files[0].name}`;
-        }
+        if (this.files.length > 0) fileText.textContent = `✓ ${this.files[0].name}`;
     });
 
-    function updateStatus(icon, message) {
-        document.getElementById("status").innerHTML = `<span>${icon}</span><span>${message}</span>`;
-    }
+    function updateStatus(icon, message) { document.getElementById("status").innerHTML = `<span>${icon}</span><span>${message}</span>`; }
 
     async function uploadContacts() {
         const fileInput = document.getElementById("csvFile");
-        if (!fileInput.files.length) {
-            updateStatus("⚠️", "Please select a CSV file first.");
-            return;
-        }
-
+        if (!fileInput.files.length) return;
         const formData = new FormData();
         formData.append("file", fileInput.files[0]);
         updateStatus("⏳", "Uploading...");
-
-        try {
-            const res = await fetch(`${API_BASE}/upload-contacts`, { method: "POST", body: formData });
-            const data = await res.json();
-            updateStatus("✅", `Uploaded ${data.count} contacts`);
-            document.getElementById("resultsSection").style.display = "none";
-        } catch (err) {
-            updateStatus("❌", "Upload failed");
-        }
+        const res = await authorizedFetch(`${API_BASE}/upload-contacts`, { method: "POST", body: formData });
+        if (res && res.ok) { const data = await res.json(); updateStatus("✅", `Uploaded ${data.count} contacts`); }
     }
 
     async function startCalls(){
         updateStatus("⏳", "Starting calls...");
-
-        const r = await fetch(`${API_BASE}/start-calls`, {method:"POST"});
-        const d = await r.json();
-
-        if(d.error){
-            updateStatus("❌", d.error);
-            return;
-        }
-
-        document.getElementById("startBtn").disabled = true;
-        document.getElementById("stopBtn").disabled = false;
-
-        updateStatus("📞", `Calling ${d.total} contacts...`);
-        startPolling();
+        const res = await authorizedFetch(`${API_BASE}/start-calls`, { method: "POST" });
+        if(res && res.ok){ document.getElementById("startBtn").disabled = true; document.getElementById("stopBtn").disabled = false; startPolling(); }
     }
 
     async function stopCalls(){
-        await fetch(`${API_BASE}/stop-calls`, {method:"POST"});
-
-        updateStatus("🛑", "Calling stopped");
-
-        document.getElementById("startBtn").disabled = false;
-        document.getElementById("stopBtn").disabled = true;
-
-        stopPolling();
+        const res = await authorizedFetch(`${API_BASE}/stop-calls`, { method: "POST" });
+        if(res && res.ok) { document.getElementById("startBtn").disabled = false; document.getElementById("stopBtn").disabled = true; stopPolling(); }
     }
-
 
     let pollingInterval = null;
-
     function startPolling() {
         if (pollingInterval) return;
-
         pollingInterval = setInterval(async () => {
-            try {
-                const res = await fetch(`${API_BASE}/call-progress`);
+            const res = await authorizedFetch(`${API_BASE}/call-progress`);
+            if (res && res.ok) {
                 const data = await res.json();
-
                 updateStatus("📞", `Progress: ${data.completed}/${data.total}`);
-
-                if(data.total > 0 && data.completed >= data.total){
-                    stopPolling();
-                    updateStatus("All calls completed. Load results.");
-
-                    document.getElementById("startBtn").disabled = false;
-                    document.getElementById("stopBtn").disabled = true;
-                }
-
-            } catch (e) {
-                console.error("Polling error:", e);
-            }
+                if(data.total > 0 && data.completed >= data.total) stopPolling();
+            } else stopPolling();
         }, 5000);
     }
+    function stopPolling() { if(pollingInterval) { clearInterval(pollingInterval); pollingInterval = null; } }
 
     async function loadResults() {
         updateStatus("⏳", "Loading results...");
-        
-        try {
-            const response = await fetch(`${API_BASE}/result-csv`);
-            const csvText = await response.text();
-            
-            console.log("CSV Response:", csvText);
-            
-            if (!csvText || csvText.includes('"status"')) {
-                updateStatus("⚠️", "CSV not ready yet. Please wait and try again.");
-                return;
-            }
-            
+        const res = await authorizedFetch(`${API_BASE}/result-csv`);
+        if (res && res.ok) {
+            const csvText = await res.text();
             const lines = csvText.trim().split('\n');
             const headers = lines[0].split(',');
             const tbody = document.getElementById('resultsBody');
             tbody.innerHTML = '';
-            
             for (let i = 1; i < lines.length; i++) {
                 const values = lines[i].split(',');
                 const row = document.createElement('tr');
-                
                 values.forEach((value, index) => {
                     const td = document.createElement('td');
-                    
                     if (headers[index].toLowerCase().trim() === 'response') {
-                        const statusClass = value.trim() || 'unknown';
-                        td.innerHTML = `<span class="status-badge ${statusClass}">${value.replace(/_/g, ' ')}</span>`;
-                    } else {
-                        td.textContent = value;
-                    }
-                    
+                        td.innerHTML = `<span class="status-badge ${value.trim()}">${value.trim().replace(/_/g, ' ')}</span>`;
+                    } else td.textContent = value;
                     row.appendChild(td);
                 });
-                
                 tbody.appendChild(row);
             }
-            
             document.getElementById('resultsSection').style.display = 'block';
-            updateStatus("✅", "Results loaded successfully!");
-            
-        } catch (error) {
-            console.error('Error:', error);
-            updateStatus("❌", "Error loading results: " + error.message);
+            updateStatus("✅", "Results loaded.");
         }
     }
-
-    function downloadCSV() {
-        window.open(`${API_BASE}/result-csv`, "_blank");
-    }
+    function downloadCSV() { window.open(`${API_BASE}/result-csv`, "_blank"); }
+    window.onload = () => {
+        authorizedFetch(`${API_BASE}/call-progress`).then(async (res) => {
+            if (res && res.ok) {
+                const data = await res.json();
+                if (data.total > 0 && data.completed < data.total) { document.getElementById("startBtn").disabled = true; document.getElementById("stopBtn").disabled = false; startPolling(); }
+                else updateStatus("✅", "System Ready");
+            }
+        });
+    };
 </script>
-
 </body>
 </html>
