@@ -2,3 +2,9 @@ fastapi
 uvicorn
 python-dotenv
 twilio
+python-multipart
+requests
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt
+sqlalchemy
